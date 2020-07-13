@@ -1,0 +1,18 @@
+$users = Get-ADUser -Filter *
+
+$userlist=@{}
+
+foreach ($user in $users){
+
+$usergroups = (Get-ADPrincipalGroupMembership -Identity $user)
+$grouplist = $null
+
+    foreach ($usergroup in $usergroups){
+        $grouplist += $usergroup.name + "`n"
+    }
+
+$userlist.Add("$($user.SamAccountName)", "$grouplist")
+
+}
+
+$userlist.GetEnumerator() | Select-Object -Property Key,Value | Export-Csv -NoTypeInformation -Path $env:TEMP\users.csv
